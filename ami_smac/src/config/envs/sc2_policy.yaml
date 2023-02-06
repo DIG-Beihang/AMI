@@ -1,0 +1,39 @@
+env: sc2
+
+env_args:
+  continuing_episode: False
+  difficulty: "7"
+  game_version: null
+  map_name: "3s6z"
+  move_amount: 2
+  obs_all_health: True
+  obs_instead_of_state: False
+  obs_last_action: False
+  obs_own_health: True
+  obs_pathing_grid: False
+  obs_terrain_height: False
+  obs_timestep_number: False
+  reward_death_value: 10
+  reward_defeat: -200
+  reward_negative_scale: 1
+  reward_only_positive: False
+  reward_scale: True
+  reward_scale_rate: 20
+  reward_sparse: False
+  reward_win: 200
+  state_last_action: True
+  state_timestep_number: False
+  step_mul: 8
+  seed: null
+  heuristic_ai: False
+  heuristic_rest: False
+  debug: False
+  replay_dir: ""
+  replay_prefix: ""
+
+test_greedy: True
+
+victim_args:
+  mac: basic_mac
+  checkpoint_path: "./ckpt/mappo_3s6z"
+  load_step: 0

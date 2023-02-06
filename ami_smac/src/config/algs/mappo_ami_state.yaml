@@ -1,0 +1,56 @@
+# --- MAPPO specific parameters ---
+mode: "adv_state"
+mac: state_maa_mac
+
+alpha: 0.1
+eps: 1
+iter: 30
+
+action_selector: "soft_policies"
+mask_before_softmax: True
+
+use_sampled_maa: True
+
+runner: "parallel"
+
+buffer_size: 32
+batch_size_run: 32
+batch_size: 32
+
+env_args:
+  state_last_action: False
+
+target_update_interval_or_tau: 200
+
+oracle_use_criticType: "cv_oracle"
+oracle_use_current_timestep_val: True
+
+use_target_sensitivity_reward: True
+sensitivity_metric: 'L1'
+
+use_position_mask: True # if True, only agents inside the sight range of traitor will be optimized, or calculated as reward
+
+target_sensitivity_reward_with_baseline_param: 10
+social_influence_param: 10000
+rand_sensitivity_reward_param: 0.1
+target_sensitivity_reward_param: 0.1
+
+entropy_reg_param: 0
+
+obs_agent_id: True
+obs_last_action: False
+obs_individual_obs: False
+
+agent_output_type: "pi_logits"
+learner: "ppo_ami_learner"
+entropy_coef: 0.01
+use_rnn: False
+standardise_rewards: True
+standardise_returns: False
+q_nstep: 5
+
+critic_type: "cv_critic"
+
+epochs: 4
+eps_clip: 0.2
+name: "mappo_ami_state"

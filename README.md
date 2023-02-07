@@ -130,7 +130,7 @@ sh adv_mujoco.sh
 
 results will be stored in `ami_mujoco/scripts/results/`.
 
-## Demo
+## Video
 
-Videos are available in `demo/` folder.
+Videos are available in `video/` folder.
 

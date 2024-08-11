@@ -467,8 +467,10 @@ class MujocoRunner(Runner):
         eval_rnn_states = np.zeros((self.n_eval_rollout_threads, self.num_agents, self.recurrent_N, self.hidden_size),
                                    dtype=np.float32)
         eval_masks = np.ones((self.n_eval_rollout_threads, self.num_agents, 1), dtype=np.float32)
-
+        # i = 0
         while True:
+            # i+=1
+            # print("训练第", i )
             self.victim_policy.actor.eval()
             self.victim_policy.critic.eval()
             if self.all_args.adv_algorithm_name == "mappo_fgsm":
@@ -477,6 +479,14 @@ class MujocoRunner(Runner):
                                     np.concatenate(eval_rnn_states_victim[:, self.adv_agent_ids]),
                                     np.concatenate(eval_masks))
                 eval_obs[:, self.adv_agent_ids] = obs
+                
+            elif self.all_args.adv_algorithm_name == "mappo_iclr":
+                obs = self.attack.forward(np.concatenate(eval_obs[:, self.adv_agent_ids]),
+                                    np.concatenate(eval_rnn_states),
+                                    np.concatenate(eval_rnn_states_victim[:, self.adv_agent_ids]),
+                                    np.concatenate(eval_masks))
+                eval_obs[:, self.adv_agent_ids] = obs
+                # print("生成基于FGSM的观测")
                 
             eval_actions_victim, eval_rnn_states_victim = \
                 self.victim_policy.act(np.concatenate(eval_obs),
@@ -496,7 +506,7 @@ class MujocoRunner(Runner):
             eval_rnn_states = np.array(np.split(_t2n(eval_rnn_states), self.n_eval_rollout_threads))
 
             eval_actions_use = eval_actions_victim.copy()
-            if not self.all_args.adv_algorithm_name == "mappo_fgsm":
+            if not (self.all_args.adv_algorithm_name == "mappo_fgsm" or self.all_args.adv_algorithm_name == "mappo_gma"):
                 eval_actions_use[:, self.adv_agent_ids] = eval_actions
 
             # Obser reward and next obs

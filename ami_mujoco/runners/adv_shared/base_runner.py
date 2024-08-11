@@ -129,11 +129,18 @@ class Runner(object):
                     oracle_critic = torch.load(str(self.adv_checkpoint_path) + '/oracle_critic.pt')
                     self.policy.oracle_critic.load_state_dict(oracle_critic)
 
-        if self.all_args.adv_algorithm_name == "mappo_fgsm":
-            self.attack = FGSM(self.all_args, self.victim_policy, self.policy, device = self.device)
+        # if self.all_args.adv_algorithm_name == "mappo_fgsm":
+        #     self.attack = FGSM(self.all_args, self.victim_policy, self.policy, device = self.device)
+        # if self.all_args.adv_algorithm_name == "mappo_iclr":
+        #     self.attack = FGSM(self.all_args, self.victim_policy, self.trainer.policy, device = self.device)
         
         # algorithm
         self.trainer = TrainAlgo(self.all_args, self.policy, device = self.device)
+        
+        if self.all_args.adv_algorithm_name == "mappo_fgsm":
+            self.attack = FGSM(self.all_args, self.victim_policy, self.policy, device = self.device)
+        elif self.all_args.adv_algorithm_name == "mappo_gma":
+            self.attack = FGSM(self.all_args, self.victim_policy, self.trainer.policy, device = self.device)
         
         # buffer
         self.victim_buffer = SharedReplayBuffer(self.all_args,

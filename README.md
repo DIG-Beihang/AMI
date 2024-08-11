@@ -87,6 +87,12 @@ python -u src/main.py --config=mappo_icml --env-config=sc2_policy
 python -u src/main.py --config=mappo_usenix --env-config=sc2_policy
 ```
 
+##### [Adversarial attacks on cooperative multi-agent deep reinforcement learning: a dynamic group-based adversarial example transferability method (CAIS 2023)](https://doi.org/10.1007/s40747-023-01145-w)
+
+```bash
+python -u src/main.py --config=mappo_gma --env-config=sc2_policy
+```
+
 #### Running Observation-based Attacks
 
 ##### AMI-driven
@@ -124,7 +130,7 @@ sh train_mujoco.sh
 
 ```bash
 # adv_algo controls the attack algorithm. 
-# Choices: mappo_iclr, mappo_icml, mappo_usenix, mappo_ami, mappo_fgsm
+# Choices: mappo_iclr, mappo_icml, mappo_usenix, mappo_ami, mappo_fgsm, mappo_gma
 sh adv_mujoco.sh
 ```
 

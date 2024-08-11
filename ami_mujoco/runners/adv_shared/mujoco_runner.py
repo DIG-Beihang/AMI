@@ -69,7 +69,7 @@ class MujocoRunner(Runner):
                        values_victim, actions_victim, action_log_probs_victim, \
                        rnn_states_victim, rnn_states_critic_victim 
 
-                if self.all_args.adv_algorithm_name == "mappo_iclr" or \
+                if self.all_args.adv_algorithm_name == "mappo_gma" or \
                     self.all_args.adv_algorithm_name == "mappo_fgsm":
                     data = obs, share_obs, rewards, dones, infos, \
                        values, actions, action_log_probs, \
@@ -480,7 +480,7 @@ class MujocoRunner(Runner):
                                     np.concatenate(eval_masks))
                 eval_obs[:, self.adv_agent_ids] = obs
                 
-            elif self.all_args.adv_algorithm_name == "mappo_iclr":
+            elif self.all_args.adv_algorithm_name == "mappo_gma":
                 obs = self.attack.forward(np.concatenate(eval_obs[:, self.adv_agent_ids]),
                                     np.concatenate(eval_rnn_states),
                                     np.concatenate(eval_rnn_states_victim[:, self.adv_agent_ids]),

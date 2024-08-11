@@ -73,6 +73,7 @@ class Runner(object):
             from algorithms.mappo_policy import MAPPO_Policy as VictimPolicy
 
         if self.all_args.adv_algorithm_name == "mappo_iclr" or \
+            self.all_args.adv_algorithm_name == "mappo_gma" or \
             self.all_args.adv_algorithm_name == "mappo_fgsm":
             from algorithms.mappo_trainer import MAPPO as TrainAlgo
             from algorithms.mappo_policy import MAPPO_Policy as Policy

@@ -412,7 +412,7 @@ def run_sequential_adv_policy(args, logger, victim_args):
         episode = 0
         # Evaluate sequential
         for _ in range(args.test_nepisode):
-            _, episode_batch = runner.run_adv_policy(test_mode=True)
+            _, episode_batch = runner.run_adv_state(test_mode=True)
             adv_buffer.insert_episode_batch(episode_batch)
 
             if adv_buffer.can_sample(args.batch_size):
@@ -482,7 +482,7 @@ def run_sequential_adv_policy(args, logger, victim_args):
 
             last_test_T = runner.t_env
             for _ in range(n_test_runs):
-                runner.run_adv_policy(test_mode=True)
+                runner.run_adv_state(test_mode=True)
 
         if args.save_model and (
             runner.t_env - model_save_time >= args.save_model_interval

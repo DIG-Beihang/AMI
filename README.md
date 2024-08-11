@@ -130,7 +130,7 @@ sh train_mujoco.sh
 
 ```bash
 # adv_algo controls the attack algorithm. 
-# Choices: mappo_iclr, mappo_icml, mappo_usenix, mappo_ami, mappo_fgsm, mappo_gma
+# Choices: mappo_iclr, mappo_icml, mappo_usenix, mappo_ami, mappo_fgsm
 sh adv_mujoco.sh
 ```
 

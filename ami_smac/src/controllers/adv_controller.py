@@ -89,3 +89,56 @@ class AdvMAC:
             input_shape += self.n_agents
 
         return input_shape
+
+    def _build_inputs_adv(self, batch, t):  
+        bs = batch.batch_size
+        inputs = []
+        inputs.append(batch["obs"][:, t])  # b1av
+
+        if self.args.obs_last_action:
+            if t == 0:
+                inputs.append(th.zeros_like(batch["actions_onehot"][:, t]))
+            else:
+                inputs.append(batch["actions_onehot"][:, t-1])
+        if self.args.obs_agent_id:
+            adv_index = []
+            for i in range(batch["obs"].shape[0]):
+                adv_index.append(th.eye(self.n_agents, device=batch.device)[:self.args.n_adv_agents])
+            adv_index = th.stack(adv_index, dim=0)
+            inputs.append(adv_index)
+        inputs = th.cat([x.reshape(bs*self.n_adv_agents, -1) for x in inputs], dim=1)
+        
+        return batch["obs"][:, t], adv_index
+
+    def forward_adv(self, ep_batch, t, test_mode=False):
+        agent_inputs = self._build_inputs(ep_batch, t)
+        avail_actions = ep_batch["avail_actions"][:, t]
+        agent_outs, _ = self.agent(agent_inputs, self.hidden_states)
+        if self.agent_output_type == "pi_logits":
+            if getattr(self.args, "mask_before_softmax", True):
+                reshaped_avail_actions = avail_actions.reshape(ep_batch.batch_size * self.n_adv_agents, -1)
+                agent_outs[reshaped_avail_actions == 0] = -1e10
+            agent_outs = th.nn.functional.softmax(agent_outs, dim=-1)
+        return agent_outs
+
+    def fgsm(self, batch, t, mac):
+        celoss = th.nn.CrossEntropyLoss()
+        target = th.argmax(self.forward_adv(batch, t), dim=-1)
+        target = target.clone().detach().cuda()
+
+        agent_inputs, adv_index = self._build_inputs_adv(batch, t)
+        agent_inputs = agent_inputs.clone().detach().squeeze().cuda()
+        adv_index = adv_index.clone().detach().squeeze().cuda()
+        adv_inputs = agent_inputs.clone().detach()
+
+        for i in range(self.args.iter):
+            adv_inputs.requires_grad = True
+            adv_in = th.cat([adv_inputs, adv_index], dim=-1).squeeze()
+            outputs = mac.forward_fgsm(adv_in, batch, t)
+            cost = - celoss(outputs, target)
+            grad = th.autograd.grad(cost, adv_inputs, retain_graph=False, create_graph=False)[0]
+            adv_inputs = adv_inputs.detach() + self.args.alpha * grad.sign()
+            delta = th.clamp(adv_inputs - agent_inputs, min=-self.args.eps, max=self.args.eps)
+            adv_inputs = th.clamp(agent_inputs + delta, min=-1, max=1).detach()
+        
+        return adv_inputs
